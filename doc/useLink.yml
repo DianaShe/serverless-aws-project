@@ -1,0 +1,30 @@
+summary: "Redirect to Original Link"
+description: "Redirects the user to the original link based by a shortened link id."
+security:
+  - bearerAuth: []
+pathParams:
+  - name: "linkId"
+    description: "The short link id"
+    schema:
+      type: "string"
+methodResponses:
+  - statusCode: 200
+    responseBody:
+      description: "Redirection"
+    responseModels:
+      application/json: RedirectResponse
+  - statusCode: 400
+    responseBody:
+      description: "Bad Request"
+    responseModels:
+      application/json: BadRequestResponse
+  - statusCode: 404
+    responseBody:
+      description: "Not Found"
+    responseModels:
+      application/json: NotFoundResponse
+  - statusCode: 500
+    responseBody:
+      description: "Internal Server Error"
+    responseModels:
+      application/json: ErrorResponse

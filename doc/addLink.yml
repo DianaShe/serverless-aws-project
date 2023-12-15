@@ -1,0 +1,22 @@
+summary: "Add Link"
+description: "Creates a new shortened link with an expiration time."
+security:
+  - bearerAuth: []
+requestModels:
+  application/json: AddLinkRequest
+methodResponses:
+  - statusCode: 200
+    responseBody:
+      description: "Successful response with the details of the shortened link."
+    responseModels:
+      application/json: AddLinkResponse
+  - statusCode: 400
+    responseBody:
+      description: "Bad Request"
+    responseModels:
+      application/json: BadRequestResponse
+  - statusCode: 500
+    responseBody:
+      description: "Internal Server Error."
+    responseModels:
+      application/json: ErrorResponse

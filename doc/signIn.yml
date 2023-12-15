@@ -1,0 +1,20 @@
+summary: "Log In"
+description: "Authenticates a user with their email and password."
+requestModels:
+  application/json: SignInRequest
+methodResponses:
+  - statusCode: 200
+    responseBody:
+      description: "Successful authentication with user data."
+    responseModels:
+      application/json: SignInResponse
+  - statusCode: 400
+    responseBody:
+      description: "Bad Request"
+    responseModels:
+      application/json: BadRequestResponse
+  - statusCode: 500
+    responseBody:
+      description: "Internal Server Error."
+    responseModels:
+      application/json: ErrorResponse

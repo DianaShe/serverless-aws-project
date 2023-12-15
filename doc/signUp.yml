@@ -1,0 +1,20 @@
+summary: "Create User"
+description: "Creates a new user with email and password."
+requestModels:
+  application/json: SignUpRequest
+methodResponses:
+  - statusCode: 201
+    responseBody:
+      description: "A user object with access token."
+    responseModels:
+      application/json: SignUpResponse
+  - statusCode: 400
+    responseBody:
+      description: "Bad Request"
+    responseModels:
+      application/json: BadRequestResponse
+  - statusCode: 500
+    responseBody:
+      description: "Server error when creating a new user."
+    responseModels:
+      application/json: ErrorResponse

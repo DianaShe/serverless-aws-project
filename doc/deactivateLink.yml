@@ -1,0 +1,20 @@
+summary: "Deactivate Link by id"
+description: "Delete a link by id"
+security:
+  - bearerAuth: []
+methodResponses:
+  - statusCode: 200
+    responseBody:
+      description: "Successful deactivation of the link."
+    responseModels:
+      application/json: DeactivateLinkResponse
+  - statusCode: 400
+    responseBody:
+      description: "Bad Request"
+    responseModels:
+      application/json: BadRequestResponse
+  - statusCode: 500
+    responseBody:
+      description: "Internal Server Error"
+    responseModels:
+      application/json: ErrorResponse

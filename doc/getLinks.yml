@@ -1,0 +1,20 @@
+summary: "Get User's Links"
+description: "Retrieves a list of links created by the user."
+security:
+  - bearerAuth: []
+methodResponses:
+  - statusCode: 200
+    responseBody:
+      description: "A list of this user's links."
+    responseModels:
+      application/json: GetLinksResponse
+  - statusCode: 400
+    responseBody:
+      description: "Bad Request"
+    responseModels:
+      application/json: BadRequestResponse
+  - statusCode: 500
+    responseBody:
+      description: "Internal Server Error"
+    responseModels:
+      application/json: ErrorResponse

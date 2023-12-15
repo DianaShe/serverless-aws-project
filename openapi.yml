@@ -1,0 +1,123 @@
+openapi: 3.0.0
+components:
+  schemas:
+    SignUpResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    SignUpRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          pattern: '^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$'
+          description: Email address which matches regex pattern.
+        password:
+          type: string
+          minLength: 8
+          maxLength: 16
+          description: Password from 8 to 16 characters long.
+    SignInRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: User's email address.
+        password:
+          type: string
+          description: User's password.
+    SignInResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        linkId:
+          type: string
+    AddLinkRequest:
+      type: object
+      required:
+        - url
+        - expiresIn
+      properties:
+        link:
+          type: string
+          description: >-
+            The original URL to be shortened. Should start with 'http://' or
+            'https://'.
+        expiresIn:
+          type: string
+          description: >-
+            Expiration period for the link. Should be one of the variants -
+            one-time, 1d, 3d or 7d.
+    AddLinkResponse:
+      type: object
+      properties:
+        linkId:
+          type: string
+        ownerEmail:
+          type: string
+        fullUrl:
+          type: string
+        shortUrl:
+          type: string
+    UseLinkResponse:
+      type: object
+      properties:
+        fullUrl:
+          type: string
+          description: The original url the user should be redirected to.
+        expiresIn:
+          type: string
+          description: Expiration period for the link.
+    GetLinksResponse:
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              LinkId:
+                type: string
+              fullUrl:
+                type: string
+              shortUrl:
+                type: string
+              expiresIn:
+                type: string
+    DeactivateLinkResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Confirmation message.
+    BadRequestResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    NotFoundResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+  securitySchemes: {}
+info:
+  title: OpenAPI
+  description: API docs for Shortlinker Service
+  version: 1.0.0.0
+paths: {}

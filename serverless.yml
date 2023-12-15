@@ -1,0 +1,174 @@
+service: serverless-aws-project
+frameworkVersion: '3'
+
+custom:
+  usersTableName: 'users-table'
+  linksTableName: 'links-table'
+
+  documentation: ${file(doc/serverless.doc.yml):documentation}
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:BatchWriteItem
+          Resource:
+            - Fn::GetAtt: [ UsersTable, Arn ]
+            - Fn::GetAtt: [ LinksTable, Arn ]
+            - Fn::Join:
+              - "/"
+              -
+                - { "Fn::GetAtt": [UsersTable, Arn ] }
+                - "index/*"
+            - Fn::Join:
+              - "/"
+              -
+                - { "Fn::GetAtt": [LinksTable, Arn ] }
+                - "index/*"
+        - Effect: Allow
+          Action:
+            - ses:SendEmail
+            - sqs:SendMessage
+            - sqs:SendMessageBatch
+          Resource: "*"
+ 
+  region: eu-central-1
+  httpApi:
+    cors: true
+    authorizers:
+      customAuthorizer:
+        type: request
+        functionName: verify-token
+        payloadFormatVersion: 2.0
+        enableSimpleResponses: true
+        identitySource: $request.header.Authorization
+      
+  environment:
+    USERS_TABLE: ${self:custom.usersTableName}
+    LINKS_TABLE: ${self:custom.linksTableName}
+    SECRET: asdfghjklzxcvbnm
+    BASE: shor.di/
+    QUEUE_URL: ${construct:jobs.queueUrl}
+    SENDER_EMAIL: "ShortLink_Support"
+
+functions:
+  verify-token:
+    handler: controllers/verifyToken.handler
+  
+  signIn:
+    handler: controllers/users/signIn.handler
+    events:
+      - httpApi:
+          method: post
+          path: /sign-in
+          documentation: ${file(doc/signIn.yml)}
+  
+  signUp:
+    handler: controllers/users/signUp.handler
+    events:
+      - httpApi:
+          method: post
+          path: /sign-up
+         
+          documentation: ${file(doc/signUp.yml)}
+
+  addLink:
+    handler: controllers/links/addLink.handler
+    events:
+      - httpApi:
+          method: post
+          path: /links/add
+          authorizer:
+            name: customAuthorizer
+         
+          documentation: ${file(doc/addLink.yml)}
+  deleteLink:
+    handler: controllers/links/deactivateLink.handler
+    events:
+      - httpApi:
+          method: delete
+          path: /links/deactivate
+          authorizer:
+            name: customAuthorizer
+          documentation: ${file(doc/deactivateLink.yml)}
+  getLinks:
+    handler: controllers/links/getOwnLinks.handler
+    events:
+      - httpApi:
+          method: get
+          path: /links/get
+          authorizer:
+            name: customAuthorizer
+          documentation: ${file(doc/getLinks.yml)}
+  useLink:
+    handler: controllers/links/getLink.handler
+    events:
+      - httpApi:
+          method: get
+          path: /links/{linkId}
+          authorizer:
+            name: customAuthorizer
+          documentation: ${file(doc/useLink.yml)}
+
+  expireLinks:
+    handler: controllers/links/expireLinks.handler
+    events:
+      - schedule: rate(4 minutes)
+
+  # publisher: 
+  #   handler: controllers/notification/publisher
+  #   # environment:
+    #         QUEUE_URL: ${construct:jobs.queueUrl}
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: email
+            AttributeType: S
+          
+        KeySchema:
+          - AttributeName: email
+            KeyType: HASH
+        
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.usersTableName}
+    LinksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: linkId
+            AttributeType: S
+          - AttributeName: ownerEmail
+            AttributeType: S
+        KeySchema:
+          - AttributeName: linkId
+            KeyType: HASH
+          - AttributeName: ownerEmail
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:custom.linksTableName}
+
+constructs:
+  jobs:
+    type: queue
+    worker:
+      handler: controllers/notification/worker.handler
+      
+
+plugins:
+  - serverless-openapi-documentation
+  - serverless-lift      
+        

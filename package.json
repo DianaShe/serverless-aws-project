@@ -1,0 +1,14 @@
+{
+  "name": "serverless-aws-project",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "nanoid": "^3.0.0"
+  },
+  "devDependencies": {
+    "serverless-lift": "^1.28.1",
+    "serverless-openapi-documentation": "^0.4.0"
+  }
+}

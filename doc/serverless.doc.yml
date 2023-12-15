@@ -1,0 +1,158 @@
+documentation:
+  version: "1.0.0.0"
+  title: "OpenAPI"
+  description: "API docs for Shortlinker Service"
+
+  securitySchemes:
+    bearerAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: "For accessing the protected routes, a valid JWT token must be passed in the header."
+
+  models:
+    - name: SignUpResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          accessToken:
+            type: string
+          refreshToken:
+            type: string
+
+    - name: SignUpRequest
+      contentType: "application/json"
+      schema:
+        type: object
+        required:
+          - email
+          - password
+        properties:
+          email:
+            type: string
+            pattern: "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$"
+            description: "Email address which matches regex pattern."
+          password:
+            type: string
+            minLength: 8
+            maxLength: 16
+            description: "Password from 8 to 16 characters long."
+
+    - name: SignInRequest
+      contentType: "application/json"
+      schema:
+        type: object
+        required:
+          - email
+          - password
+        properties:
+          email:
+            type: string
+            description: "User's email address."
+          password:
+            type: string
+            description: "User's password."
+
+    - name: SignInResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          accessToken:
+            type: string
+          linkId:
+            type: string
+
+    - name: AddLinkRequest
+      contentType: "application/json"
+      schema:
+        type: object
+        required:
+          - url
+          - expiresIn
+        properties:
+          link:
+            type: string
+            description: "The original URL to be shortened. Should start with 'http://' or 'https://'."
+          expiresIn:
+            type: string
+            description: "Expiration period for the link. Should be one of the variants - one-time, 1d, 3d or 7d."
+
+    - name: AddLinkResponse 
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          linkId:
+            type: string
+          ownerEmail:
+            type: string
+          fullUrl:
+            type: string
+          shortUrl:
+            type: string
+
+    - name: UseLinkResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          fullUrl:
+            type: string
+            description: "The original url the user should be redirected to."
+          expiresIn:
+            type: string
+            description: "Expiration period for the link."
+
+    - name: GetLinksResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          links:
+            type: array
+            items:
+              type: object
+              properties:
+                LinkId:
+                  type: string
+                fullUrl:
+                  type: string
+                shortUrl:
+                  type: string
+                expiresIn:
+                  type: string
+
+    - name: DeactivateLinkResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          message:
+            type: string
+            description: "Confirmation message."
+
+    - name: BadRequestResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          message:
+            type: string
+
+    - name: NotFoundResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          message:
+            type: string
+
+    - name: ErrorResponse
+      contentType: "application/json"
+      schema:
+        type: object
+        properties:
+          message:
+            type: string
