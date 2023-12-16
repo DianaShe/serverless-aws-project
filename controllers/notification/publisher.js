@@ -1,19 +1,18 @@
-const { sqs } = require ("../../index");
+const { SQSClient, SendMessageCommand } = require("@aws-sdk/client-sqs");
+const sqs = new SQSClient();
 const HttpError = require("../../utils/httpError");
 
-const QUEUE_URL = process.env.QUEUE_URL;
+const QUEUE_URL = process.env.QUEUE_URL || "";
 
-const publisher = async (email, linkIds) => {
+const publisher = async (emailTo, linkIds) => {
   try {
-    await sqs
-      .sendMessage({
+    await sqs.send(new SendMessageCommand({
         QueueUrl: QUEUE_URL,
         MessageBody: JSON.stringify({
           linkIds,
-          email,
+          emailTo,
         }),
-      })
-      .promise();
+      }));
   } catch (error) {
     throw HttpError(400, "Something went wrong. Please, try again later");
   }

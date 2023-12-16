@@ -123,10 +123,10 @@ functions:
   expireLinks:
     handler: controllers/links/expireLinks.handler
     events:
-      - schedule: rate(4 minutes)
+      - schedule: rate(3 minutes)
 
-  # publisher: 
-  #   handler: controllers/notification/publisher
+  publisher: 
+    handler: controllers/notification/publisher.handler
   #   # environment:
     #         QUEUE_URL: ${construct:jobs.queueUrl}
 

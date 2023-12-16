@@ -13,15 +13,6 @@ const emailNotification = (linkIds) => {
               padding: 20px;
             }
             
-            h1 {
-              color: #333;
-              font-size: 24px;
-            }
-            p {
-              color: #555;
-              font-size: 16px;
-              margin: 10px 0;
-            }
             
           </style>
         </head>

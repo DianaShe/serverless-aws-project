@@ -1,38 +1,39 @@
-const {ses} = require("../../index")
+const {SESClient, SendEmailCommand} = require("@aws-sdk/client-ses")
 
 const emailNotification = require ("../../constants/emailNotification");
 const HttpError = require ("../../utils/httpError");
 
+const ses = new SESClient()
 
 
 const worker = async (event) => {
-  const sourceUrl = process.env.SENDER_EMAIL;
+  const sourceEmail = process.env.SENDER_EMAIL;
 
-  if (!sourceUrl) {
-    throw HttpError(400, "SENDER_EMAIL is not defined in environment variables.");
+  if (!sourceEmail) {
+    throw HttpError(400, "SENDER_EMAIL is not defined.");
   }
 
   for (const message of event.Records) {
     const bodyData = JSON.parse(message.body);
-    const { email, linkIds } = bodyData;
+    const { emailTo, linkIds } = bodyData;
 
-    const emailBody = emailNotification(linkIds);
+    const emailText = emailNotification(linkIds);
 
     const params = {
-      Source: sourceUrl,
-      Destination: { ToAddresses: [email] },
+      Source: sourceEmail,
+      Destination: { ToAddresses: [emailTo] },
       Message: {
         Subject: { Data: "Short Link Expiration Notification" },
         Body: {
           Html: {
-            Data: emailBody,
+            Data: emailText,
           },
         },
       },
     };
 
     try {
-      await ses.sendEmail(params).promise();
+      await ses.send(SendEmailCommand(params));
     } catch (error) {
       throw HttpError(400, "Error sending email");
     }

@@ -10,7 +10,7 @@ const { nanoid } = require("nanoid");
 const HttpError = require("../utils/httpError");
 
 const EXP_PERIOD = require("../constants/expirationPeriod");
-// const { handler: publisherHandler } = require("../controllers/notification/publisher");
+const { handler: publisherHandler } = require("../controllers/notification/publisher");
 
 const LINKS_TABLE = process.env.LINKS_TABLE;
 const BASE = process.env.BASE;
@@ -28,7 +28,7 @@ class LinkService {
       throw HttpError(400, `Invalid period value: ${period}`);
     }
 
-    return new Date(currentTime + expiresIn);
+    return new Date(currentTime + expiresIn).toString();
   }
 
   async findLinkById(linkId, ownerEmail) {
@@ -67,7 +67,7 @@ class LinkService {
   async addLink(fullUrl, period, ownerEmail) {
     const shortUrl = BASE + nanoid(6);
     const linkId = nanoid(6);
-    const expiresIn = JSON.stringify(this.calculateExpiration(period));
+    const expiresIn = this.calculateExpiration(period);
 
     const params = {
       TableName: LINKS_TABLE,
@@ -82,6 +82,8 @@ class LinkService {
 
     await dynamoDbClient.send(new PutCommand(params));
 
+    
+
     return {
       shortUrl,
       fullUrl,
@@ -91,7 +93,8 @@ class LinkService {
   }
 
   async deleteLink(ownerEmail, linkIds) {
-    // await publisherHandler (ownerEmail, linkIds);
+    await publisherHandler (ownerEmail, linkIds);
+
     const deleteRequests = linkIds.map((id) => {
       return {
         DeleteRequest: {
@@ -120,7 +123,7 @@ class LinkService {
     const data = await dynamoDbClient.send(new ScanCommand(params));
 
     const expired = data.Items.filter((item) => {
-      const expiresIn = new Date(JSON.parse(item.expiresIn)).getTime();
+      const expiresIn = new Date(item.expiresIn).getTime();
 
       return currentTime > expiresIn && item.expiresIn !== "one-time";
     });
